@@ -239,6 +239,11 @@ func (s *Server) loadSettings(filename string) error {
 
 	fmt.Println("Settings loaded")
 
+	// Check environment variable for BasePath if not set in config
+	if s.settings.BasePath == "" {
+		s.settings.BasePath = os.Getenv("STEAM_SCREENSHOTS_BASEPATH")
+	}
+
 	// Normalize BasePath
 	if s.settings.BasePath != "" {
 		// Ensure it starts with / and doesn't end with /

@@ -12,6 +12,7 @@ services:
       - ${STEAM_SCREENSHOTS_APPDATA:-./appdata}:/app/appdata:rw
     environment:
       - TZ=UTC
+      - STEAM_SCREENSHOTS_BASEPATH=${STEAM_SCREENSHOTS_BASEPATH}
     restart: unless-stopped
     networks:
       - steam-screenshots
