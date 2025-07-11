@@ -13,6 +13,7 @@ type TemplateData struct {
 	Header        map[string]string
 	Body          []map[string]template.JS
 	ImageMetadata []Metadata
+	BasePath      string
 }
 
 func init_templates() error {

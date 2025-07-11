@@ -1,5 +1,6 @@
 {
     "Address": ":8080",
+    "BasePath": "",
     "AppidOverrides": [
         {
             "id": "231410",

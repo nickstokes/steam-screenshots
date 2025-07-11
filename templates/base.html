@@ -4,8 +4,8 @@
     <head>
     <title>{{ block "title" .Title}}{{end}}Steam Screenshots</title>
     {{ if .ImageMetadata }}
-    <link rel="stylesheet" href="/static/photoswipe.css" type="text/css" />
-    <link rel="stylesheet" href="/static/default-skin/default-skin.css" type="text/css" />
+    <link rel="stylesheet" href="{{.BasePath}}/static/photoswipe.css" type="text/css" />
+    <link rel="stylesheet" href="{{.BasePath}}/static/default-skin/default-skin.css" type="text/css" />
     {{ end }}
     <style>
         .body {
@@ -132,13 +132,13 @@
         }
     </style>
     </head>
-    <body style="background-image: url('/static/bg-repeat.png'); background-repeat: repeat-x; background-color: #1b2838;">
+    <body style="background-image: url('{{.BasePath}}/static/bg-repeat.png'); background-repeat: repeat-x; background-color: #1b2838;">
         <div id="title">{{block "header" .Header}}{{end}}</div>
         <div id="container">
-        {{ block "body" .Body }}{{end}}
+        {{ block "body" . }}{{end}}
         </div>
         {{ if .ImageMetadata }}
-            {{ block "photoswipe" .ImageMetadata }}{{end}}
+            {{ block "photoswipe" . }}{{end}}
         {{ end }}
     </body>
 </html>{{end}}

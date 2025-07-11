@@ -43,7 +43,7 @@ func (s *Server) handler_game(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	imageMeta := s.ImageCache.GetMetadata(appid)
+	imageMeta := s.getImageMetadataWithBasePath(appid)
 
 	files := []string{}
 	for _, m := range imageMeta {
@@ -64,6 +64,7 @@ func (s *Server) handler_game(w http.ResponseWriter, r *http.Request) {
 	}
 	d.Body = []map[string]template.JS{}
 	d.ImageMetadata = imageMeta
+	d.BasePath = s.settings.BasePath
 
 	for idx, filename := range files {
 		base := filepath.Base(filename)
@@ -74,8 +75,8 @@ func (s *Server) handler_game(w http.ResponseWriter, r *http.Request) {
 		}
 
 		d.Body = append(d.Body, map[string]template.JS{
-			"ImageTarget":  template.JS("/img/" + appid + "/" + base),
-			"ThumbnailSrc": template.JS("/thumb/" + appid + "/" + base),
+			"ImageTarget":  template.JS(s.settings.BasePath + "/img/" + appid + "/" + base),
+			"ThumbnailSrc": template.JS(s.settings.BasePath + "/thumb/" + appid + "/" + base),
 			"Text":         template.JS(base),
 			"Clear":        template.JS(clearclass),
 			"Idx":          template.JS(fmt.Sprintf("%d", idx)),
@@ -94,6 +95,7 @@ func (s *Server) handler_main(w http.ResponseWriter, r *http.Request) {
 
 	d := TemplateData{}
 	d.Body = []map[string]template.JS{}
+	d.BasePath = s.settings.BasePath
 	for _, k := range keys {
 		pretty, err := s.getGameName(k)
 		if err != nil {
@@ -199,6 +201,7 @@ func (s *Server) handler_static(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handler_debug(w http.ResponseWriter, r *http.Request) {
 	d := TemplateData{}
 	d.Body = []map[string]template.JS{}
+	d.BasePath = s.settings.BasePath
 
 	if len(gitCommit) == 0 {
 		gitCommit = "Missing commit hash"
@@ -227,4 +230,16 @@ func (s *Server) handler_debug(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+// getImageMetadataWithBasePath returns image metadata with basepath-corrected URLs
+func (s *Server) getImageMetadataWithBasePath(appid string) []Metadata {
+	imageMeta := s.ImageCache.GetMetadata(appid)
+	
+	// Update URLs to include basepath
+	for i := range imageMeta {
+		imageMeta[i].Src = s.settings.BasePath + imageMeta[i].Src
+	}
+	
+	return imageMeta
 }

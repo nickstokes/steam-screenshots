@@ -2,7 +2,7 @@
 
 {{define "body"}}
 <div id="mainlist">
-    {{range .}}<div class="grid{{.Clear}}"><a href="/game/{{.Target}}"><img src="/img/{{.Target}}banner.jpg" height="215" /><div class="txtlink subtext">{{.Pretty}} <span class="count">({{.Count}})</span></div></a></div>
+    {{range .Body}}<div class="grid{{.Clear}}"><a href="{{$.BasePath}}/game/{{.Target}}"><img src="{{$.BasePath}}/img/{{.Target}}banner.jpg" height="215" /><div class="txtlink subtext">{{.Pretty}} <span class="count">({{.Count}})</span></div></a></div>
     {{end}}
 </div>
 {{end}}

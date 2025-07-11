@@ -5,9 +5,9 @@
 {{end}}
 
 {{define "body"}}
-<div id="backlink"><a href="/">&lt;-- Back</a></div><br />
+<div id="backlink"><a href="{{.BasePath}}/">&lt;-- Back</a></div><br />
 <div id="thumblist">
-    {{range .}}<div class="thumbnail" onclick="return ps({{.Idx}})"><a href="{{.ImageTarget}}"><img src="{{.ThumbnailSrc}}" /><div class="thumblink subtext">{{.Text}}</div></a></div>{{end}}
+    {{range .Body}}<div class="thumbnail" onclick="return ps({{.Idx}})"><a href="{{.ImageTarget}}"><img src="{{.ThumbnailSrc}}" /><div class="thumblink subtext">{{.Text}}</div></a></div>{{end}}
 </div>
 {{end}}
 
@@ -71,12 +71,12 @@
                 </div>
             </div>
         </div>
-        <script src="/static/photoswipe.min.js"></script>
-        <script src="/static/photoswipe-ui-default.min.js"></script>
+        <script src="{{.BasePath}}/static/photoswipe.min.js"></script>
+        <script src="{{.BasePath}}/static/photoswipe-ui-default.min.js"></script>
 
         <script >
             var pswpElement = document.querySelectorAll('.pswp')[0];
-            var items = {{.}};
+            var items = {{.ImageMetadata}};
 
             function ps(idx) {
                 var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {index: idx});

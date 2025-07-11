@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -28,6 +29,7 @@ import (
 type Settings struct {
 	ImageDirectory  string
 	Address         string
+	BasePath        string // Base path for reverse proxy deployments
 	AppidOverrides  []struct {
 		Appid string `json:"id"`
 		Name  string `json:"name"`
@@ -124,9 +126,16 @@ func (s *Server) Run() error {
 	mux.HandleFunc("/api/get-cache", s.handler_api_cache)
 	mux.HandleFunc("PUT /api/upload/{appid}/{filename}", s.handler_api_upload)
 
+	// Wrap with basepath handling if configured
+	var handler http.Handler = mux
+	if s.settings.BasePath != "" {
+		handler = http.StripPrefix(s.settings.BasePath, mux)
+		fmt.Printf("Using base path: %s\n", s.settings.BasePath)
+	}
+
 	server := &http.Server{
 		Addr:           s.settings.Address,
-		Handler:        mux,
+		Handler:        handler,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -229,6 +238,20 @@ func (s *Server) loadSettings(filename string) error {
 	}
 
 	fmt.Println("Settings loaded")
+
+	// Normalize BasePath
+	if s.settings.BasePath != "" {
+		// Ensure it starts with / and doesn't end with /
+		if !strings.HasPrefix(s.settings.BasePath, "/") {
+			s.settings.BasePath = "/" + s.settings.BasePath
+		}
+		s.settings.BasePath = strings.TrimSuffix(s.settings.BasePath, "/")
+		
+		// Validate basepath doesn't contain invalid characters
+		if strings.Contains(s.settings.BasePath, "..") || strings.Contains(s.settings.BasePath, "//") {
+			return fmt.Errorf("invalid BasePath: contains invalid characters")
+		}
+	}
 
 	// TODO: make this filename configurable
 	s.Games, err = LoadGameList("games.cache")
